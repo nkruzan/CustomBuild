@@ -197,6 +197,10 @@ def run_build(task, tmpdir, outdir, logpath):
     if not os.path.isfile(os.path.join(outdir, 'extra_hwdef.dat')):
         app.logger.error('Build aborted, missing extra_hwdef.dat')
     app.logger.info('Appending to build.log')
+    esp32_boards = ["esp32buzz",
+                "esp32diy",
+                "esp32icarus",
+                ]
     with open(logpath, 'a') as log:
 
         # setup PATH to point at our compiler
