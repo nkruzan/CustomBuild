@@ -35,6 +35,7 @@ def get_boards():
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     all_boards = mod.AUTOBUILD_BOARDS
+    esp32_boards = mod.ESP32_BOARDS
     default_board = mod.AUTOBUILD_BOARDS[0]
     exclude_patterns = [ 'fmuv*', 'SITL*' ]
     boards = []
@@ -46,6 +47,16 @@ def get_boards():
                 break
         if not excluded:
             boards.append(b)
+    
+    for b in esp32_boards:
+        excluded = False
+        for p in exclude_patterns:
+            if fnmatch.fnmatch(b.lower(), p.lower()):
+                excluded = True
+                break
+        if not excluded:
+            boards.append(b)
+    
     boards.sort()
     return (boards, boards[0])
 
@@ -179,7 +190,6 @@ def create_directory(dir_path):
     app.logger.info('Creating ' + dir_path)
     pathlib.Path(dir_path).mkdir(parents=True, exist_ok=True)
 
-
 def run_build(task, tmpdir, outdir, logpath):
     '''run a build with parameters from task'''
     remove_directory_recursive(tmpdir_parent)
@@ -197,6 +207,14 @@ def run_build(task, tmpdir, outdir, logpath):
 
         env["PATH"] = bindir1 + ":" + bindir2 + ":" + env["PATH"]
         env['CCACHE_DIR'] = cachedir
+        if task['board'] in esp32_boards:
+            app.logger.info('Running esp32 prereqs')
+            app.logger.info('Source export.sh')
+            subprocess.run(['source', './modules/esp_idf/export.sh')
+            app.logger.info('install pexpect empy in virtualenv')
+            subprocess.run(['python3', '-m', 'pip', 'install', 'empy', 'pexpect')
+            app.logger.info('preconfigure')
+            subprocess.run(['python3', './waf', 'configure')
 
         app.logger.info('Running waf configure')
         subprocess.run(['python3', './waf', 'configure',
