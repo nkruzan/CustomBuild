@@ -210,11 +210,20 @@ def run_build(task, tmpdir, outdir, logpath):
         if task['board'] in esp32_boards:
             app.logger.info('Running esp32 prereqs')
             app.logger.info('Source export.sh')
-            subprocess.run(['source', './modules/esp_idf/export.sh')
+            subprocess.run(['source', './modules/esp_idf/export.sh'],
+                        cwd = task['sourcedir'],
+                        env=env,
+                        stdout=log, stderr=log)
             app.logger.info('install pexpect empy in virtualenv')
-            subprocess.run(['python3', '-m', 'pip', 'install', 'empy', 'pexpect')
+            subprocess.run(['python3', '-m', 'pip', 'install', 'empy', 'pexpect'],
+                        cwd = task['sourcedir'],
+                        env=env,
+                        stdout=log, stderr=log)
             app.logger.info('preconfigure')
-            subprocess.run(['python3', './waf', 'configure')
+            subprocess.run(['python3', './waf', 'configure'],
+                        cwd = task['sourcedir'],
+                        env=env,
+                        stdout=log, stderr=log)
 
         app.logger.info('Running waf configure')
         subprocess.run(['python3', './waf', 'configure',
