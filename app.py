@@ -218,7 +218,7 @@ def run_build(task, tmpdir, outdir, logpath):
                 import subprocess, os
                 pipe = subprocess.Popen(". %s; env" % script, stdout=subprocess.PIPE, shell=True)
                 output = pipe.communicate()[0]
-                env = dict((line.split("=", 1).decode('utf8').strip() for line in output.splitlines()))
+                env = dict((line.split("=", 1) for line in output.decode('utf8').splitlines()))
                 os.environ.update(env)
 
             app.logger.info('Running esp32 prereqs')
