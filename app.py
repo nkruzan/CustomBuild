@@ -214,7 +214,7 @@ def run_build(task, tmpdir, outdir, logpath):
                         cwd = task['sourcedir'],
                         env=env,
                         stdout=log, stderr=log)
-            app.logger.info('install pexpect empy in virtualenv'])
+            app.logger.info('install pexpect empy in virtualenv')
             subprocess.run(['python3', '-m', 'pip', 'install', 'empy', 'pexpect'],
                         cwd = task['sourcedir'],
                         env=env,
