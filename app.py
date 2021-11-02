@@ -448,7 +448,7 @@ except IOError:
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
     try:
-        update_source()
+        #update_source()
 
         # fetch features from user input
         extra_hwdef = []
