@@ -214,7 +214,7 @@ def run_build(task, tmpdir, outdir, logpath):
         if task['board'] in esp32_boards:
             app.logger.info('Running esp32 prereqs')
             app.logger.info('Source export.sh')
-            subprocess.run([os.path.abspath(os.path.join(sourcedir,'modules', 'esp_idf','export.sh'))],
+            subprocess.run(['bash', 'source', os.path.abspath(os.path.join(sourcedir,'modules', 'esp_idf','export.sh'))],
                         cwd = task['sourcedir'],
                         env=env,
                         stdout=log, stderr=log)
