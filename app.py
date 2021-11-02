@@ -208,8 +208,8 @@ def run_build(task, tmpdir, outdir, logpath):
         bindir1 = os.path.abspath(os.path.join(appdir, "..", "bin"))
         bindir2 = os.path.abspath(os.path.join(appdir, "..", "gcc", "bin"))
         cachedir = os.path.abspath(os.path.join(appdir, "..", "cache"))
-
-        env["PATH"] = bindir1 + ":" + bindir2 + ":" + env["PATH"]
+        esp_tools = os.path.abspath(os.path.join(sourcedir,'modules', 'esp_idf'))
+        env["PATH"] = bindir1 + ":" + bindir2 + ":" + esp_tools + ":" + env["PATH"]
         env['CCACHE_DIR'] = cachedir
         if task['board'] in esp32_boards:
             app.logger.info('Running esp32 prereqs')
