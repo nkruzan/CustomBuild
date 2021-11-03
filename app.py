@@ -215,7 +215,7 @@ def run_build(task, tmpdir, outdir, logpath):
             app.logger.info('Running esp32 prereqs')
             app.logger.info('Source export.sh')
             
-            pipe = subprocess.Popen("python3", esp_tools, "tools", "idf_tools.py", "export", stdout=subprocess.PIPE, shell=True)
+            pipe = subprocess.Popen("python3 " + esp_tools + "/tools/idf_tools.py export", stdout=subprocess.PIPE, shell=True)
             output = pipe.communicate()[0]
             esp_env = dict((line.split("=", 1) for line in output.splitlines()))
             env["PATH"] = esp_env["PATH"] + ":" + env["PATH"]
