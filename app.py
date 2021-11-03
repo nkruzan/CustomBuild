@@ -282,7 +282,7 @@ def check_queue():
     queue_lock.acquire()
     ip_list = []
     for f in json_files:
-        file = json.loads(open(f).read())
+        file = json.loads(open(f,encoding="utf-8").read())
         ip_list.append(file['ip'])
     seen = set()
     ip_list.reverse()
