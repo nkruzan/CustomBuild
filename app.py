@@ -208,16 +208,32 @@ def run_build(task, tmpdir, outdir, logpath):
         bindir1 = os.path.abspath(os.path.join(appdir, "..", "bin"))
         bindir2 = os.path.abspath(os.path.join(appdir, "..", "gcc", "bin"))
         cachedir = os.path.abspath(os.path.join(appdir, "..", "cache"))
-
-        env["PATH"] = bindir1 + ":" + bindir2 + ":" + env["PATH"]
+        esp_tools = os.path.abspath(os.path.join(sourcedir,'modules', 'esp_idf'))
+        esp_tools2 = os.path.abspath('/home/user/.espressif/tools/xtensa-esp32-elf/esp-2020r3-8.4.0/xtensa-esp32-elf/bin')
+        env["PATH"] = bindir1 + ":" + bindir2 + ":" + esp_tools2 + ":" + env["PATH"]
         env['CCACHE_DIR'] = cachedir
         if task['board'] in esp32_boards:
             app.logger.info('Running esp32 prereqs')
-            app.logger.info('Source export.sh')
-            subprocess.run(['source', './modules/esp_idf/export.sh'],
-                        cwd = task['sourcedir'],
-                        env=env,
-                        stdout=log, stderr=log)
+            app.logger.info('run idf_tools.py')
+            tools_output = tmpdir + "/idf-output.txt"
+            with open(tools_output, "w") as output:
+                subprocess.run(['python3',esp_tools + "/tools/idf_tools.py", "--idf-path",esp_tools,"export"],
+                            cwd = esp_tools,
+                            env=env,
+                            stdout=output, stderr=log, encoding="utf-8")
+            
+            with open(tools_output, "r") as f:
+                t = []
+                output = f.readlines()
+                for line in output:
+                    for export in line.split(";"):
+                        t.append(export.replace("export ", " ").strip())
+            
+            esp_env = dict((export.split("=", 1) for export in t))
+            env["PATH"] = esp_env["PATH"] + ":" + env["PATH"]
+            esp_env.pop("PATH", None)
+            env.update(esp_env)
+            
             app.logger.info('install pexpect empy in virtualenv')
             subprocess.run(['python3', '-m', 'pip', 'install', 'empy', 'pexpect'],
                         cwd = task['sourcedir'],
