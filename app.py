@@ -213,14 +213,19 @@ def run_build(task, tmpdir, outdir, logpath):
         env['CCACHE_DIR'] = cachedir
         if task['board'] in esp32_boards:
             app.logger.info('Running esp32 prereqs')
-            app.logger.info('Source export.sh')
+            app.logger.info('run idf_tools.py')
             
-            pipe = subprocess.Popen("python3 " + esp_tools + "/tools/idf_tools.py export", stdout=subprocess.PIPE, shell=True)
-            output = pipe.communicate()[0]
-            esp_env = dict((line.decode("utf-8").split("=", 1) for line in output.splitlines()))
-            env["PATH"] = esp_env["PATH"] + ":" + env["PATH"]
-            esp_env.pop("PATH", None)
-            env.update(esp_env)
+            subprocess.run(["python3 " + esp_tools + "/tools/idf_tools.py export --idf-path " + esp_tools],
+                        cwd = esp_tools,
+                        env=env,
+                        stdout=log, stderr=log)
+
+#            pipe = subprocess.Popen("python3 " + esp_tools + "/tools/idf_tools.py export", shell=True)
+#            output = pipe.communicate()[0]
+            #esp_env = dict((line.decode("utf-8").split("=", 1) for line in output.splitlines()))
+            #env["PATH"] = esp_env["PATH"] + ":" + env["PATH"]
+            #esp_env.pop("PATH", None)
+            #env.update(esp_env)
             
             app.logger.info('install pexpect empy in virtualenv')
             subprocess.run(['python3', '-m', 'pip', 'install', 'empy', 'pexpect'],
