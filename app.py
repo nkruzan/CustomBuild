@@ -215,7 +215,7 @@ def run_build(task, tmpdir, outdir, logpath):
             app.logger.info('Running esp32 prereqs')
             app.logger.info('run idf_tools.py')
             
-            subprocess.run(["python3 " + esp_tools + "/tools/idf_tools.py --idf-path " + esp_tools + " export"],
+            subprocess.run(['python3',esp_tools + "/tools/idf_tools.py", "--idf-path",esp_tools,"export"],
                         cwd = esp_tools,
                         env=env,
                         stdout=log, stderr=log)
