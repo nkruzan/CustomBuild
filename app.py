@@ -223,7 +223,7 @@ def run_build(task, tmpdir, outdir, logpath):
 
             app.logger.info('Running esp32 prereqs')
             app.logger.info('Source export.sh')
-            shell_source("." + os.path.abspath(os.path.join(sourcedir,'modules', 'esp_idf','export.sh')))
+            shell_source(". " + os.path.abspath(os.path.join(sourcedir,'modules', 'esp_idf','export.sh')))
             app.logger.info('install pexpect empy in virtualenv')
             subprocess.run(['python3', '-m', 'pip', 'install', 'empy', 'pexpect'],
                         cwd = task['sourcedir'],
