@@ -224,8 +224,9 @@ def run_build(task, tmpdir, outdir, logpath):
             with open(tools_output, "r") as f:
                 t = []
                 output = f.readlines()
-                for export in output.split(";"):
-                    t.append(str.replace("export ", ""))
+                for line in output:
+                    for export in line.split(";"):
+                        t.append(str.replace("export ", ""))
             
             esp_env = dict((export.split("=", 1) for export in t))
             env["PATH"] = esp_env["PATH"] + ":" + env["PATH"]
