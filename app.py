@@ -217,8 +217,8 @@ def run_build(task, tmpdir, outdir, logpath):
                 settings some environment variables. Here is a way to do it."""
                 import subprocess, os
                 pipe = subprocess.Popen(". %s; env" % script, stdout=subprocess.PIPE, shell=True)
-                output = pipe.communicate()[0].decode('utf-8')
-                env = dict((line.split("=", 1) for line in output.splitlines()))
+                output = pipe.communicate()[0]
+                env = dict((line.decode('utf-8').split("=", 1) for line in output.splitlines()))
                 os.environ.update(env)
 
             app.logger.info('Running esp32 prereqs')
