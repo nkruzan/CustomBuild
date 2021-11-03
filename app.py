@@ -214,12 +214,19 @@ def run_build(task, tmpdir, outdir, logpath):
         if task['board'] in esp32_boards:
             app.logger.info('Running esp32 prereqs')
             app.logger.info('run idf_tools.py')
-            with open(tmpdir + "/idf-output.txt", "w") as output:
+            tools_output = tmpdir + "/idf-output.txt"
+            with open(tools_output, "w") as output:
                 subprocess.run(['python3',esp_tools + "/tools/idf_tools.py", "--idf-path",esp_tools,"export"],
                             cwd = esp_tools,
                             env=env,
                             stdout=output, stderr=log, encoding="utf-8")
-            esp_env = dict((line.decode("utf-8").split("=", 1) for line in output.splitlines()))
+            
+            with open(tools_output, "r") as output:
+                t = []
+                for export in output.split(";"):
+                    t.append(str.replace("export ", ""))
+            
+            esp_env = dict((line.split("=", 1) for line in t))
             env["PATH"] = esp_env["PATH"] + ":" + env["PATH"]
             esp_env.pop("PATH", None)
             env.update(esp_env)
