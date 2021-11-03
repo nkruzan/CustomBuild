@@ -223,7 +223,7 @@ def run_build(task, tmpdir, outdir, logpath):
             
             with open(tools_output, "r") as f:
                 t = []
-                output = [line.rstrip('\n') for line in f]
+                output = f.readlines()
                 for export in output.split(";"):
                     t.append(str.replace("export ", ""))
             
