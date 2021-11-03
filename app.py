@@ -221,12 +221,13 @@ def run_build(task, tmpdir, outdir, logpath):
                             env=env,
                             stdout=output, stderr=log, encoding="utf-8")
             
-            with open(tools_output, "r") as output:
+            with open(tools_output, "r") as f:
                 t = []
+                output = [line.rstrip('\n') for line in f]
                 for export in output.split(";"):
                     t.append(str.replace("export ", ""))
             
-            esp_env = dict((line.split("=", 1) for line in t))
+            esp_env = dict((export.split("=", 1) for export in t))
             env["PATH"] = esp_env["PATH"] + ":" + env["PATH"]
             esp_env.pop("PATH", None)
             env.update(esp_env)
