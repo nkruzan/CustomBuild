@@ -216,13 +216,13 @@ def run_build(task, tmpdir, outdir, logpath):
             app.logger.info('Running esp32 prereqs')
             app.logger.info('run idf_tools.py')
             tools_output = tmpdir + "/idf-output.txt"
-            with open(tools_output, "w") as output:
+            with open(tools_output, "w",encoding="utf-8") as output:
                 subprocess.run(['python3',esp_tools + "/tools/idf_tools.py", "--idf-path",esp_tools,"export"],
                             cwd = esp_tools,
                             env=env,
                             stdout=output, stderr=log, encoding="utf-8")
             
-            with open(tools_output, "r") as f:
+            with open(tools_output, "r", encoding="utf-8") as f:
                 t = []
                 output = f.readlines()
                 for line in output:
@@ -239,11 +239,11 @@ def run_build(task, tmpdir, outdir, logpath):
                         cwd = task['sourcedir'],
                         env=env,
                         stdout=log, stderr=log)
-            app.logger.info('preconfigure')
-            subprocess.run(['python3', './waf', 'configure'],
-                        cwd = task['sourcedir'],
-                        env=env,
-                        stdout=log, stderr=log)
+        #    app.logger.info('preconfigure')
+        #    subprocess.run(['python3', './waf', 'configure'],
+        #                cwd = task['sourcedir'],
+        #                env=env,
+        #                stdout=log, stderr=log)
 
         app.logger.info('Running waf configure')
         subprocess.run(['python3', './waf', 'configure',
@@ -282,13 +282,13 @@ def check_queue():
     queue_lock.acquire()
     ip_list = []
     for f in json_files:
-        file = json.loads(open(f).read())
+        file = json.loads(open(f,encoding="utf-8").read())
         ip_list.append(file['ip'])
     seen = set()
     ip_list.reverse()
     for index, value in enumerate(ip_list):
         if value in seen:
-            file = json.loads(open(json_files[-index-1]).read())
+            file = json.loads(open(json_files[-index-1],encoding="utf-8").read())
             outdir_to_delete = os.path.join(outdir_parent, file['token'])
             remove_directory_recursive(outdir_to_delete)
         else:
@@ -300,7 +300,7 @@ def check_queue():
     json_files = sort_json_files()
     taskfile = json_files[0]
     app.logger.info('Opening ' + taskfile)
-    task = json.loads(open(taskfile).read())
+    task = json.loads(open(taskfile,encoding="utf-8").read())
     app.logger.info('Removing ' + taskfile)
     os.remove(taskfile)
     outdir = os.path.join(outdir_parent, task['token'])
@@ -320,7 +320,7 @@ def check_queue():
     except Exception as ex:
         app.logger.info(ex)('Build failed: ', ex)
         pass
-    open(logpath,'a').write("\nBUILD_FINISHED\n")
+    open(logpath,'a',encoding="utf-8").write("\nBUILD_FINISHED\n")
 
 def file_age(fname):
     '''return file age in seconds'''
@@ -367,7 +367,7 @@ def get_build_status():
         age_str = "%u:%02u" % ((age_min // 60), age_min % 60)
         feature_file = os.path.join(outdir_parent, b, 'selected_features.json')
         app.logger.info('Opening ' + feature_file)
-        selected_features_dict = json.loads(open(feature_file).read())
+        selected_features_dict = json.loads(open(feature_file,encoding="utf-8").read())
         selected_features = selected_features_dict['selected_features']
         git_hash_short = selected_features_dict['git_hash_short']
         features = ''
@@ -401,7 +401,7 @@ def create_status():
     f = open(tmpfile, "w")
     app2 = Flask("status")
     with app2.app_context():
-        f.write(render_template_string(open(os.path.join(appdir, 'templates', 'status.html')).read(),
+        f.write(render_template_string(open(os.path.join(appdir, 'templates', 'status.html'),encoding="utf-8").read(),
                                        build_status=build_status))
     f.close()
     os.replace(tmpfile, statusfile)
@@ -451,7 +451,7 @@ if not os.path.isdir(outdir_parent):
     create_directory(outdir_parent)
 
 try:
-    lock_file = open(os.path.join(basedir, "queue.lck"), "w")
+    lock_file = open(os.path.join(basedir, "queue.lck"), "w",encoding="utf-8")
     fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
     app.logger.info("Got queue lock")
     # we only want one set of threads
@@ -499,7 +499,7 @@ def generate():
         # create extra_hwdef.dat file and obtain md5sum
         app.logger.info('Creating ' + 
                         os.path.join(outdir_parent, 'extra_hwdef.dat'))
-        file = open(os.path.join(outdir_parent, 'extra_hwdef.dat'), 'w')
+        file = open(os.path.join(outdir_parent, 'extra_hwdef.dat'), 'w',encoding="utf-8")
         app.logger.info('Writing\n' + extra_hwdef)
         file.write(extra_hwdef)
         file.close()
@@ -544,13 +544,13 @@ def generate():
                 '\nSelected Features:\n' + feature_list +
                 '\n\nWaiting for build to start...\n\n')
             app.logger.info('Creating build.log')
-            build_log = open(os.path.join(outdir, 'build.log'), 'w')
+            build_log = open(os.path.join(outdir, 'build.log'), 'w',encoding="utf-8")
             build_log.write(build_log_info)
             build_log.close()
             # create hwdef.dat
             app.logger.info('Opening ' + 
                             os.path.join(outdir, 'extra_hwdef.dat'))
-            file = open(os.path.join(outdir, 'extra_hwdef.dat'),'w')
+            file = open(os.path.join(outdir, 'extra_hwdef.dat'),'w',encoding="utf-8")
             app.logger.info('Writing\n' + extra_hwdef)
             file.write(extra_hwdef)
             file.close()
@@ -563,13 +563,13 @@ def generate():
             task['board'] = board
             task['ip'] = request.remote_addr
             app.logger.info('Opening ' + os.path.join(outdir, 'q.json'))
-            jfile = open(os.path.join(outdir, 'q.json'), 'w')
+            jfile = open(os.path.join(outdir, 'q.json'), 'w',encoding="utf-8")
             app.logger.info('Writing task file to ' + 
                             os.path.join(outdir, 'q.json'))
             jfile.write(json.dumps(task, separators=(',\n', ': ')))
             jfile.close()
             # create selected_features.dat for status table
-            feature_file = open(os.path.join(outdir, 'selected_features.json'), 'w')
+            feature_file = open(os.path.join(outdir, 'selected_features.json'), 'w',encoding="utf-8")
             app.logger.info('Writing\n' + os.path.join(outdir, 'selected_features.json'))
             feature_file.write(json.dumps(selected_features_dict))
             feature_file.close()
