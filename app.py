@@ -209,21 +209,19 @@ def run_build(task, tmpdir, outdir, logpath):
         bindir2 = os.path.abspath(os.path.join(appdir, "..", "gcc", "bin"))
         cachedir = os.path.abspath(os.path.join(appdir, "..", "cache"))
         esp_tools = os.path.abspath(os.path.join(sourcedir,'modules', 'esp_idf'))
-        env["PATH"] = bindir1 + ":" + bindir2 + ":" + esp_tools + ":" + env["PATH"]
+        env["PATH"] = bindir1 + ":" + bindir2 + ":" + env["PATH"]
         env['CCACHE_DIR'] = cachedir
         if task['board'] in esp32_boards:
-            def shell_source(script):
-                """Sometime you want to emulate the action of "source" in bash,
-                settings some environment variables. Here is a way to do it."""
-                import subprocess, os
-                pipe = subprocess.Popen(". %s; env" % script, stdout=subprocess.PIPE, shell=True)
-                output = pipe.communicate()[0]
-                env = dict((line.decode('utf-8').split("=", 1) for line in output.splitlines()))
-                os.environ.update(env)
-
             app.logger.info('Running esp32 prereqs')
             app.logger.info('Source export.sh')
-            shell_source(os.path.abspath(os.path.join(sourcedir,'modules', 'esp_idf','export.sh')))
+            
+            pipe = subprocess.Popen("python3", esp_tools, "tools", "idf_tools.py", "export", stdout=subprocess.PIPE, shell=True)
+            output = pipe.communicate()[0]
+            esp_env = dict((line.decode('utf-8').split("=", 1) for line in output.splitlines()))
+            env["PATH"] = esp_env["PATH"] + ":" + env["PATH"]
+            esp_env.pop("PATH", None)
+            env.update(esp_env)
+            
             app.logger.info('install pexpect empy in virtualenv')
             subprocess.run(['python3', '-m', 'pip', 'install', 'empy', 'pexpect'],
                         cwd = task['sourcedir'],
